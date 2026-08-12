@@ -9,3 +9,8 @@ render_states*
 
 .vscode/
 .parity_tmp/
+
+# Local-only preservation bundle, verification workspace, and showcase media
+local_media/
+.preservation_tmp/
+.preservation_verify/
