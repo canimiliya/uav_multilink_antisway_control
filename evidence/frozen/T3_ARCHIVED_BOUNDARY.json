@@ -1,0 +1,10 @@
+{
+  "wind_direction": "world +X",
+  "lqr_max_recoverable_mps": 3.0,
+  "lqr_first_failure_mps": 4.0,
+  "satc_max_recoverable_mps": 5.0,
+  "satc_first_failure_mps": 6.0,
+  "source_freeze_tag": "research-final-freeze-2026-08-12",
+  "source_freeze_commit": "73d3dbcfbe9388deafb98999c1696fb18e8d7825",
+  "rerun": false
+}

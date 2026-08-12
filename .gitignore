@@ -8,3 +8,4 @@ render_states*
 *.log
 
 .vscode/
+.parity_tmp/

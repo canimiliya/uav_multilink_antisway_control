@@ -11,5 +11,5 @@ The release pins commit `9eb1a2dcfe438ce7b4c4cd119072e4f3d8a6a816`. Udaan is Cop
 Clone with submodules enabled:
 
 ```bash
-git clone --recurse-submodules https://github.com/canimiliya/uav_multilink_antisway_control_final.git
+git clone --recurse-submodules https://github.com/canimiliya/uav_multilink_antisway_control.git
 ```
