@@ -1,7 +1,7 @@
 {
   "controller": "corrected_pid",
   "architecture": "equilibrium-anchored cascaded relative-tip-motion correction plus UAV PID/PD",
-  "implementation": "uav_sway.controllers.classical.V3CascadedTaskPID",
+  "implementation": "uav_sway.controllers.classical.CascadedTaskPID",
   "selected": {
     "candidate_id": "hybrid_x007_y041_z041",
     "sample_count": 75,

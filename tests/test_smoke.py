@@ -4,6 +4,8 @@ import hashlib
 import json
 from pathlib import Path
 
+import pytest
+
 import mujoco
 
 
@@ -24,15 +26,24 @@ def test_model_load() -> None:
 
 
 def test_pid_import() -> None:
-    from uav_sway.controllers.classical import V3CascadedTaskPID
+    from uav_sway.controllers import CascadedTaskPID
 
-    assert V3CascadedTaskPID.__name__ == "V3CascadedTaskPID"
+    assert CascadedTaskPID.__name__ == "CascadedTaskPID"
 
 
 def test_lqr_import() -> None:
-    from uav_sway.controllers.classical import V3FullStateLQR
+    from uav_sway.controllers import FullStateLQR
 
-    assert V3FullStateLQR.__name__ == "V3FullStateLQR"
+    assert FullStateLQR.__name__ == "FullStateLQR"
+
+
+def test_legacy_class_names_are_removed() -> None:
+    legacy_pid = "V3" + "CascadedTaskPID"
+    legacy_lqr = "V3" + "FullStateLQR"
+    with pytest.raises(ImportError):
+        exec("from uav_sway.controllers.classical import " + legacy_pid, {})
+    with pytest.raises(ImportError):
+        exec("from uav_sway.controllers.classical import " + legacy_lqr, {})
 
 
 def test_satc_import() -> None:

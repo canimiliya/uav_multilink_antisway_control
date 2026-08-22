@@ -10,10 +10,10 @@ Reproducible MuJoCo simulation code for anti-sway control of a 6-DoF UAV carryin
 
 The project evaluates three frozen outer-loop controllers with the same plant, task-space output, rates, disturbance definition, and actuator limits:
 
-| Method | Implementation | Identity |
+| Method | Description | Frozen configuration |
 |---|---|---|
-| PID | Cascaded task PID | `V3CascadedTaskPID` / `hybrid_x007_y041_z041` |
-| Full-State LQR | Full-state linear feedback | `V3FullStateLQR` / `full_lqr_048` |
+| PID | Cascaded task PID | `hybrid_x007_y041_z041` |
+| Full-State LQR | Full-state linear feedback | `full_lqr_048` |
 | SATC-OFMPC | Causal constrained task coordination | `SATC-OFMPC` / `satc_b_027` |
 
 The model uses a 1 kHz MuJoCo physics step, a 200 Hz geometric inner loop, and a 20 Hz outer loop. Outer-loop acceleration is limited to 2.0 m/s² and its per-update slew is limited to 0.25 m/s².

@@ -12,8 +12,8 @@
     "commit": "9eb1a2dcfe438ce7b4c4cd119072e4f3d8a6a816"
   },
   "controllers": {
-    "pid": {"name": "V3CascadedTaskPID", "identity": "hybrid_x007_y041_z041", "evidence": "reproducibility/controllers/pid_freeze.json"},
-    "full_lqr": {"name": "V3FullStateLQR", "identity": "full_lqr_048", "evidence": "reproducibility/controllers/full_lqr_freeze.json"},
+    "pid": {"name": "CascadedTaskPID", "identity": "hybrid_x007_y041_z041", "evidence": "reproducibility/controllers/pid_freeze.json"},
+    "full_lqr": {"name": "FullStateLQR", "identity": "full_lqr_048", "evidence": "reproducibility/controllers/full_lqr_freeze.json"},
     "satc": {"name": "SATC-OFMPC", "identity": "satc_b_027", "evidence": "reproducibility/controllers/satc_ofmpc_freeze.json"}
   },
   "environment": {

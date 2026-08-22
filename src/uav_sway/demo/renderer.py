@@ -33,7 +33,7 @@ TARGET_DELTA_M = [2.0, 1.7, 4.5]
 PUBLIC_SHOWCASE_SET: tuple[dict[str, Any], ...] = (
     {
         "name": "PID",
-        "class_id": "V3CascadedTaskPID",
+        "class_id": "CascadedTaskPID",
         "controller_id": "hybrid_x007_y041_z041",
         "runner_id": "corrected_pid",
         "source_path": "src/uav_sway/controllers/classical.py",
@@ -46,7 +46,7 @@ PUBLIC_SHOWCASE_SET: tuple[dict[str, Any], ...] = (
     },
     {
         "name": "Full-LQR",
-        "class_id": "V3FullStateLQR",
+        "class_id": "FullStateLQR",
         "controller_id": "full_lqr_048",
         "runner_id": "full_lqr_048",
         "source_path": "src/uav_sway/controllers/classical.py",

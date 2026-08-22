@@ -85,7 +85,7 @@ class V3TaskPID(_V3ControllerBase):
         return self._finish(-self.kp * position_error - self.kd * velocity_error - self.ki * self.integral, np.linalg.norm(observation.full_state_error), self.integral)
 
 
-class V3CascadedTaskPID(_V3ControllerBase):
+class CascadedTaskPID(_V3ControllerBase):
     """Classical cascaded tip-reference correction and UAV PID/PD.
 
     The slow outer loop uses only the currently measured cutter-tip error and
@@ -174,7 +174,7 @@ class V3CascadedTaskPID(_V3ControllerBase):
         return self._finish(raw, np.linalg.norm(observation.full_state_error), self.integral)
 
 
-class V3FullStateLQR(_V3ControllerBase):
+class FullStateLQR(_V3ControllerBase):
     """20D full-state discrete LQR with a common 3D limiter."""
 
     def __init__(self, gain: np.ndarray) -> None:
@@ -188,5 +188,5 @@ class V3FullStateLQR(_V3ControllerBase):
         return self._finish(-self.gain @ observation.full_state_error, np.linalg.norm(observation.full_state_error), np.zeros(3))
 
 
-class V3TaskWeightedLQR(V3FullStateLQR):
+class V3TaskWeightedLQR(FullStateLQR):
     """Full-state LQR whose Q matrix is weighted by measured cutter outputs."""

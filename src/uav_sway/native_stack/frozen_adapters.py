@@ -14,7 +14,7 @@ from udaan.manif import SO3, TSO3
 
 from uav_sway.control.geometric_inner_loop import GeometricInnerLoop
 from uav_sway.task_space.state import CutterTaskState
-from uav_sway.controllers.classical import V3CascadedTaskPID, V3FullStateLQR, V3TaskWeightedLQR
+from uav_sway.controllers.classical import CascadedTaskPID, FullStateLQR, V3TaskWeightedLQR
 from uav_sway.evaluation.metrics import load_linear_model_matrices
 from uav_sway.task_space.observation import V3Observation, V3Reference
 from uav_sway.controllers.satc_ofmpc import SATCOFMPC
@@ -151,10 +151,10 @@ class LegacyTaskLevelAdapter(AccelerationOuterStackAdapter):
         root = Path(__file__).resolve().parents[3]
         if historical_id == "corrected_pid":
             p = json.loads((root/"reproducibility/controllers/pid_freeze.json").read_text(encoding="utf-8"))["parameters"]
-            return V3CascadedTaskPID(np.array(p["uav_kp"]),np.array(p["uav_kd"]),np.array(p["uav_ki"]),np.array(p["tip_kp"]),np.array(p["tip_kd"]),np.array(p["correction_limit_m"]),p["correction_slew_m_per_update"],p["integral_limit"],p["tip_velocity_mode"])
+            return CascadedTaskPID(np.array(p["uav_kp"]),np.array(p["uav_kd"]),np.array(p["uav_ki"]),np.array(p["tip_kp"]),np.array(p["tip_kd"]),np.array(p["correction_limit_m"]),p["correction_slew_m_per_update"],p["integral_limit"],p["tip_velocity_mode"])
         if historical_id in {"full_lqr_048","task_lqr_009"}:
             name="full_lqr" if historical_id.startswith("full") else "task_lqr"; p=json.loads((root/f"reproducibility/controllers/{name}_freeze.json").read_text(encoding="utf-8"))["parameters"]
-            cls=V3FullStateLQR if name=="full_lqr" else V3TaskWeightedLQR; return cls(np.array(p["K"]))
+            cls=FullStateLQR if name=="full_lqr" else V3TaskWeightedLQR; return cls(np.array(p["K"]))
         if historical_id == "satc_b_027":
             a,b=load_linear_model_matrices(root); metric=json.loads((root/"reproducibility/model/task_metric_alignment_audit.json").read_text(encoding="utf-8")); c=np.vstack([metric[x] for x in ("C_pos","C_vel","C_dir","C_omega_perp")])
             task=np.array(json.loads((root/"reproducibility/controllers/task_lqr_freeze.json").read_text(encoding="utf-8"))["parameters"]["K"]); full=np.array(json.loads((root/"reproducibility/controllers/full_lqr_freeze.json").read_text(encoding="utf-8"))["parameters"]["K"]); params=json.loads((root/"reproducibility/controllers/satc_ofmpc_freeze.json").read_text(encoding="utf-8"))["parameters"]
