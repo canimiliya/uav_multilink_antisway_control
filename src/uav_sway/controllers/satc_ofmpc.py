@@ -6,9 +6,9 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from uav_sway.v3.controllers import V3ControllerDiagnostics, _V3ControllerBase
-from uav_sway.v3.observation import V3Observation, V3Reference
-from uav_sway.v4.cart_ofmpc import CARTOFMPC
+from uav_sway.controllers.classical import V3ControllerDiagnostics, _V3ControllerBase
+from uav_sway.task_space.observation import V3Observation, V3Reference
+from uav_sway.mpc.cart_ofmpc import CARTOFMPC
 
 
 @dataclass(frozen=True)

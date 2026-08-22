@@ -35,8 +35,8 @@ from uav_sway.task_space.state import CutterTaskSpaceReader
 ROOT = Path(__file__).resolve().parents[3]
 MODEL = ROOT / "reproducibility/model/model_5link_controlled.xml"
 MODEL_SHA256 = "19105873c0fcc891ebb85efe6c20c378d5b77b6bf9003559e43ae47ca03d153d"
-OUT = ROOT / "outputs/meeting_demo_recoverable_v4"
-ART = ROOT / "artifacts/meeting_demo_recoverable_v4"
+OUT = ROOT / "outputs/meeting_demo_recoverable"
+ART = ROOT / "artifacts/meeting_demo_recoverable"
 DOC = ROOT / "docs/clean_release"
 DT, INNER_STRIDE, OUTER_STRIDE = 0.001, 5, 50
 DURATION = 40.0

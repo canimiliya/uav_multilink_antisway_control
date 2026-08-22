@@ -1,4 +1,4 @@
-"""Full-state and cutter-task observations for the V3 outer controllers."""
+"""Full-state and cutter-task observations for the outer controllers."""
 
 from __future__ import annotations
 
@@ -57,7 +57,7 @@ class V3Observation:
     def __post_init__(self) -> None:
         state = np.asarray(self.full_state_error, dtype=float).reshape(20)
         if not np.isfinite(state).all():
-            raise ValueError("V3 full state must be finite")
+            raise ValueError("full state must be finite")
         object.__setattr__(self, "full_state_error", state.copy())
         for name in ("uav_position_world", "uav_velocity_world"):
             value = np.asarray(getattr(self, name), dtype=float).reshape(3)
@@ -67,7 +67,7 @@ class V3Observation:
 
 
 class V3StateReader:
-    """Read the frozen R0 20-state schema directly from MuJoCo."""
+    """Read the frozen 20-state schema directly from MuJoCo."""
 
     STATE_NAMES = (
         "ex", "evx", "ey", "evy", "ez", "evz",

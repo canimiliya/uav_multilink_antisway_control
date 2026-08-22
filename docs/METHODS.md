@@ -10,4 +10,4 @@ All three controllers use the same MuJoCo model, disturbance definition, task-sp
 
 The controller observes UAV position and velocity, body attitude and angular velocity, five link angles and rates, cutter-tip task state, the current reference, and the previously applied physical command. The runtime does not pass future reference samples or wind truth into the controller.
 
-The controller source remains in the historical implementation modules under `src/uav_sway/v3`, `src/uav_sway/v4`, and `src/uav_sway/v5`; their public identities are documented above so users do not need to infer the method from directory numbering.
+The controller source is organized by function under `src/uav_sway/controllers`, `src/uav_sway/mpc`, `src/uav_sway/task_space`, and `src/uav_sway/evaluation`. Frozen controller identities are documented above for provenance.

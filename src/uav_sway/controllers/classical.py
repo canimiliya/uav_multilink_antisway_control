@@ -1,4 +1,4 @@
-"""Three fair V3 traditional outer-loop controllers."""
+"""The frozen PID and full-state LQR outer-loop controllers."""
 
 from __future__ import annotations
 
@@ -6,8 +6,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .contracts import V3AccelerationLimiter
-from .observation import V3Observation, V3Reference
+from uav_sway.control.contracts import V3AccelerationLimiter
+from uav_sway.task_space.observation import V3Observation, V3Reference
 
 
 @dataclass(frozen=True)

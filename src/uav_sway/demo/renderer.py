@@ -21,7 +21,7 @@ from uav_sway.demo.recovery_runner import _run_job
 ROOT = Path(__file__).resolve().parents[3]
 MODEL = ROOT / "reproducibility/model/model_5link_controlled.xml"
 MODEL_SHA256 = "19105873c0fcc891ebb85efe6c20c378d5b77b6bf9003559e43ae47ca03d153d"
-OUT = ROOT / "outputs/meeting_demo_boundary_v5"
+OUT = ROOT / "outputs/meeting_demo_boundary"
 DOC = ROOT / "docs/clean_release"
 LINEUP_RUNS = OUT / "_lineup_runs"
 
@@ -36,7 +36,7 @@ PUBLIC_SHOWCASE_SET: tuple[dict[str, Any], ...] = (
         "class_id": "V3CascadedTaskPID",
         "controller_id": "hybrid_x007_y041_z041",
         "runner_id": "corrected_pid",
-        "source_path": "src/uav_sway/v3/controllers.py",
+        "source_path": "src/uav_sway/controllers/classical.py",
         "config_path": "configs/s3_pid.yaml",
         "evidence_path": "reproducibility/controllers/pid_freeze.json",
         "acceleration_mainline": True,
@@ -49,7 +49,7 @@ PUBLIC_SHOWCASE_SET: tuple[dict[str, Any], ...] = (
         "class_id": "V3FullStateLQR",
         "controller_id": "full_lqr_048",
         "runner_id": "full_lqr_048",
-        "source_path": "src/uav_sway/v3/controllers.py",
+        "source_path": "src/uav_sway/controllers/classical.py",
         "config_path": "configs/lqr.yaml",
         "evidence_path": "reproducibility/controllers/full_lqr_freeze.json",
         "acceleration_mainline": True,
@@ -62,7 +62,7 @@ PUBLIC_SHOWCASE_SET: tuple[dict[str, Any], ...] = (
         "class_id": "SATC-OFMPC",
         "controller_id": "satc_b_027",
         "runner_id": "satc_b_027",
-        "source_path": "src/uav_sway/v5/satc_ofmpc.py",
+        "source_path": "src/uav_sway/controllers/satc_ofmpc.py",
         "config_path": "reproducibility/controllers/satc_ofmpc_freeze.json",
         "evidence_path": "reproducibility/controllers/satc_ofmpc_freeze.json",
         "acceleration_mainline": True,

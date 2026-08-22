@@ -24,19 +24,19 @@ def test_model_load() -> None:
 
 
 def test_pid_import() -> None:
-    from uav_sway.v3.controllers import V3CascadedTaskPID
+    from uav_sway.controllers.classical import V3CascadedTaskPID
 
     assert V3CascadedTaskPID.__name__ == "V3CascadedTaskPID"
 
 
 def test_lqr_import() -> None:
-    from uav_sway.v3.controllers import V3FullStateLQR
+    from uav_sway.controllers.classical import V3FullStateLQR
 
     assert V3FullStateLQR.__name__ == "V3FullStateLQR"
 
 
 def test_satc_import() -> None:
-    from uav_sway.v5.satc_ofmpc import SATCOFMPC
+    from uav_sway.controllers.satc_ofmpc import SATCOFMPC
 
     assert SATCOFMPC.__name__ == "SATCOFMPC"
 

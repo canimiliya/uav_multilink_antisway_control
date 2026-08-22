@@ -1,7 +1,7 @@
 {
   "controller": "corrected_pid",
   "architecture": "equilibrium-anchored cascaded relative-tip-motion correction plus UAV PID/PD",
-  "implementation": "uav_sway.v3.controllers.V3CascadedTaskPID",
+  "implementation": "uav_sway.controllers.classical.V3CascadedTaskPID",
   "selected": {
     "candidate_id": "hybrid_x007_y041_z041",
     "sample_count": 75,
@@ -118,6 +118,6 @@
     "position_rmse_3d_m_max": 0.25
   },
   "holdout_executed": false,
-  "implementation_sha256": "45b61d298fe1653cb8dd294bd6928b4c53df4e3002186609d5ec3844613ab1d4",
+  "implementation_sha256": "ab602417dbbfd284c522629b335438fc8c0b00737deefe8b85a4b7e3db9d7275",
   "frozen_after_competence_pass": true
 }

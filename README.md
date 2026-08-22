@@ -83,7 +83,7 @@ tests/                   Smoke and reproducibility tests
 third_party/udaan/       Pinned Udaan submodule
 ```
 
-The scientific implementation modules retain their established source namespaces under `uav_sway.v3`, `uav_sway.v4`, and `uav_sway.v5`; the public documentation uses method names and controller identities instead of development labels.
+The public implementation is organized by function: classical controllers, MPC components, task-space observation, evaluation helpers, and the native simulation stack. The frozen controller identities remain explicit in the table above for provenance.
 
 ## Reproducibility and limitations
 

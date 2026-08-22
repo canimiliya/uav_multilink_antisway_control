@@ -1,9 +1,9 @@
-"""Constraint-aware residual-trust offset-free MPC for V4.
+"""Constraint-aware residual-trust offset-free MPC.
 
 The controller uses only the measured error state, the current/past reference,
 and the previously applied limited acceleration.  The frozen task-LQR gain is
 the nominal backbone.  A bounded steady-target problem and a physical-command
-QP prevent the V3 residual-to-equilibrium saturation feedback mechanism.
+QP prevent residual-to-equilibrium saturation feedback.
 """
 
 from __future__ import annotations
@@ -16,9 +16,9 @@ import numpy as np
 
 from uav_sway.mpc.osqp_solver import OSQPPreviewSolver
 from uav_sway.mpc.qp_builder import QPData
-from uav_sway.v3.controllers import V3ControllerDiagnostics, _V3ControllerBase
-from uav_sway.v3.dr_tsrmpc import controllability_basis
-from uav_sway.v3.observation import V3Observation, V3Reference
+from uav_sway.controllers.classical import V3ControllerDiagnostics, _V3ControllerBase
+from uav_sway.mpc.controllability import controllability_basis
+from uav_sway.task_space.observation import V3Observation, V3Reference
 
 
 @dataclass(frozen=True)

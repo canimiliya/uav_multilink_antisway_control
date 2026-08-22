@@ -1,4 +1,4 @@
-"""V3 task metric alignment and LQR matrix helpers."""
+"""Task-metric alignment and LQR matrix helpers."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ import numpy as np
 from scipy.linalg import solve_discrete_are
 
 
-def load_r0_linear_matrices(root: str | Path) -> tuple[np.ndarray, np.ndarray]:
+def load_linear_model_matrices(root: str | Path) -> tuple[np.ndarray, np.ndarray]:
     root = Path(root)
     payload = json.loads((root / "reproducibility/model/linear_model_audit.json").read_text(encoding="utf-8"))
     return np.asarray(payload["A"], dtype=float).reshape(20, 20), np.asarray(payload["B"], dtype=float).reshape(20, 3)
@@ -28,7 +28,7 @@ def build_full_lqr_q(parameters: dict) -> np.ndarray:
     return np.diag(q)
 
 
-def solve_v3_lqr(a: np.ndarray, b: np.ndarray, q: np.ndarray, r: np.ndarray) -> dict:
+def solve_discrete_lqr(a: np.ndarray, b: np.ndarray, q: np.ndarray, r: np.ndarray) -> dict:
     a = np.asarray(a, dtype=float).reshape(20, 20)
     b = np.asarray(b, dtype=float).reshape(20, 3)
     q = np.asarray(q, dtype=float).reshape(20, 20)
@@ -47,7 +47,7 @@ def solve_v3_lqr(a: np.ndarray, b: np.ndarray, q: np.ndarray, r: np.ndarray) -> 
         "p_min_eigenvalue": float(np.min(np.linalg.eigvalsh(p))),
     }
     if not np.isfinite(k).all() or result["p_min_eigenvalue"] <= 0.0 or result["spectral_radius"] >= 1.0:
-        raise ValueError("V3 LQR candidate failed the algebra gate")
+        raise ValueError("LQR candidate failed the algebra gate")
     return result
 
 
