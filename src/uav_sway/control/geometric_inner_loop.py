@@ -44,7 +44,7 @@ class GeometricInnerLoop:
                           tip_target_world: np.ndarray | None = None) -> tuple[float, float]:
         """Compute the shared y/z command once per outer update.
 
-        The formal V2-R1R1 path supplies the measured cutter task state and the
+        The task-space runtime supplies the measured cutter task state and the
         external cutter target.  The UAV-state fallback is retained for older
         callers outside the frozen V2 runner.
         """

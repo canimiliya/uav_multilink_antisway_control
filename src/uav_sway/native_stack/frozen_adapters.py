@@ -1,4 +1,4 @@
-"""Native physical-wrench controllers for the frozen P2-R1R1 study."""
+"""Native physical-wrench adapters for the frozen controller lineup."""
 
 from __future__ import annotations
 
@@ -150,14 +150,14 @@ class LegacyTaskLevelAdapter(AccelerationOuterStackAdapter):
     def _load_historical(historical_id: str | None):
         root = Path(__file__).resolve().parents[3]
         if historical_id == "corrected_pid":
-            p = json.loads((root/"reproducibility/v3/r1r1/pid_freeze.json").read_text(encoding="utf-8"))["parameters"]
+            p = json.loads((root/"reproducibility/controllers/pid_freeze.json").read_text(encoding="utf-8"))["parameters"]
             return V3CascadedTaskPID(np.array(p["uav_kp"]),np.array(p["uav_kd"]),np.array(p["uav_ki"]),np.array(p["tip_kp"]),np.array(p["tip_kd"]),np.array(p["correction_limit_m"]),p["correction_slew_m_per_update"],p["integral_limit"],p["tip_velocity_mode"])
         if historical_id in {"full_lqr_048","task_lqr_009"}:
-            name="full_lqr" if historical_id.startswith("full") else "task_lqr"; p=json.loads((root/f"reproducibility/v3/r1/{name}_freeze.json").read_text(encoding="utf-8"))["parameters"]
+            name="full_lqr" if historical_id.startswith("full") else "task_lqr"; p=json.loads((root/f"reproducibility/controllers/{name}_freeze.json").read_text(encoding="utf-8"))["parameters"]
             cls=V3FullStateLQR if name=="full_lqr" else V3TaskWeightedLQR; return cls(np.array(p["K"]))
         if historical_id == "satc_b_027":
-            a,b=load_r0_linear_matrices(root); metric=json.loads((root/"reproducibility/v3/r1/task_metric_alignment_audit.json").read_text(encoding="utf-8")); c=np.vstack([metric[x] for x in ("C_pos","C_vel","C_dir","C_omega_perp")])
-            task=np.array(json.loads((root/"reproducibility/v3/r1/task_lqr_freeze.json").read_text(encoding="utf-8"))["parameters"]["K"]); full=np.array(json.loads((root/"reproducibility/v3/r1/full_lqr_freeze.json").read_text(encoding="utf-8"))["parameters"]["K"]); params=json.loads((root/"reproducibility/v5/self/self_freeze.json").read_text(encoding="utf-8"))["parameters"]
+            a,b=load_r0_linear_matrices(root); metric=json.loads((root/"reproducibility/model/task_metric_alignment_audit.json").read_text(encoding="utf-8")); c=np.vstack([metric[x] for x in ("C_pos","C_vel","C_dir","C_omega_perp")])
+            task=np.array(json.loads((root/"reproducibility/controllers/task_lqr_freeze.json").read_text(encoding="utf-8"))["parameters"]["K"]); full=np.array(json.loads((root/"reproducibility/controllers/full_lqr_freeze.json").read_text(encoding="utf-8"))["parameters"]["K"]); params=json.loads((root/"reproducibility/controllers/satc_ofmpc_freeze.json").read_text(encoding="utf-8"))["parameters"]
             return SATCOFMPC(a,b,c,task,full,params)
         return None
 

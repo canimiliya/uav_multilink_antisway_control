@@ -1,6 +1,7 @@
 __pycache__/
 .pytest_cache/
 *.pyc
+*.egg-info/
 
 outputs/
 artifacts/
@@ -9,6 +10,7 @@ render_states*
 
 .vscode/
 .parity_tmp/
+.tmp_public_polish_baseline/
 
 # Local-only preservation bundle, verification workspace, and showcase media
 local_media/

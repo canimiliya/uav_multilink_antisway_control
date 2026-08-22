@@ -16,10 +16,10 @@ from typing import Any
 import mujoco
 import numpy as np
 
-from uav_sway.demo.recoverable_runner import _run_job
+from uav_sway.demo.recovery_runner import _run_job
 
 ROOT = Path(__file__).resolve().parents[3]
-MODEL = ROOT / "reproducibility/frozen/model/model_5link_controlled.xml"
+MODEL = ROOT / "reproducibility/model/model_5link_controlled.xml"
 MODEL_SHA256 = "19105873c0fcc891ebb85efe6c20c378d5b77b6bf9003559e43ae47ca03d153d"
 OUT = ROOT / "outputs/meeting_demo_boundary_v5"
 DOC = ROOT / "docs/clean_release"
@@ -38,7 +38,7 @@ PUBLIC_SHOWCASE_SET: tuple[dict[str, Any], ...] = (
         "runner_id": "corrected_pid",
         "source_path": "src/uav_sway/v3/controllers.py",
         "config_path": "configs/s3_pid.yaml",
-        "evidence_path": "reproducibility/v3/r1r1/pid_freeze.json",
+        "evidence_path": "reproducibility/controllers/pid_freeze.json",
         "acceleration_mainline": True,
         "native_stack_only": False,
         "closed_negative_result": False,
@@ -51,7 +51,7 @@ PUBLIC_SHOWCASE_SET: tuple[dict[str, Any], ...] = (
         "runner_id": "full_lqr_048",
         "source_path": "src/uav_sway/v3/controllers.py",
         "config_path": "configs/lqr.yaml",
-        "evidence_path": "reproducibility/v3/r1/full_lqr_freeze.json",
+        "evidence_path": "reproducibility/controllers/full_lqr_freeze.json",
         "acceleration_mainline": True,
         "native_stack_only": False,
         "closed_negative_result": False,
@@ -63,8 +63,8 @@ PUBLIC_SHOWCASE_SET: tuple[dict[str, Any], ...] = (
         "controller_id": "satc_b_027",
         "runner_id": "satc_b_027",
         "source_path": "src/uav_sway/v5/satc_ofmpc.py",
-        "config_path": "reproducibility/v5/self/self_freeze.json",
-        "evidence_path": "reproducibility/v5/self/self_freeze.json",
+        "config_path": "reproducibility/controllers/satc_ofmpc_freeze.json",
+        "evidence_path": "reproducibility/controllers/satc_ofmpc_freeze.json",
         "acceleration_mainline": True,
         "native_stack_only": False,
         "closed_negative_result": False,
@@ -143,7 +143,7 @@ def audit_lineup(runtime: dict[str, dict[str, Any]]) -> dict[str, Any]:
             row["t1_stable_recovered"] = bool(runtime[candidate["runner_id"]]["metrics"].get("STABLE_RECOVERED", False))
         rows.append(row)
     return {
-        "task": "P3-R1G-VISUAL-POLISH-AND-CONTROLLER-LINEUP-AUDIT-R1",
+        "task": "public-controller-lineup-audit",
         "public_showcase_set": rows,
         "frozen_t1": {
             "initial_sway_deg": INITIAL_ANGLES_DEG,
@@ -312,7 +312,7 @@ def _write_audit(audit: dict[str, Any]) -> None:
     lines = [
         "# Public Controller Lineup Audit",
         "",
-        "Task: `P3-R1G-VISUAL-POLISH-AND-CONTROLLER-LINEUP-AUDIT-R1`.",
+        "Task: `public-controller-lineup-audit`.",
         "",
         "The audit is presentation-only. Frozen controllers, model, scenarios, and metrics were not changed; no Holdout or Native-Stack execution was used.",
         "",
@@ -386,7 +386,7 @@ def run_all() -> dict[str, Any]:
         encoding="utf-8",
     )
     manifest = {
-        "task": "P3-R1G-VISUAL-POLISH-AND-CONTROLLER-LINEUP-AUDIT-R1",
+        "task": "public-controller-lineup-audit",
         "start_head": "8d9768f9f49091c322a6f6c51feb6f303fb3cfbb",
         "model_sha256": MODEL_SHA256,
         "controller_retuned": False,
@@ -398,7 +398,7 @@ def run_all() -> dict[str, Any]:
         "fps": 30,
         "videos": videos,
     }
-    (OUT / "P3_R1G_RENDER_MANIFEST.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    (OUT / "render_manifest.json").write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     return {"audit": audit, "videos": videos, "manifest": manifest}
 
 

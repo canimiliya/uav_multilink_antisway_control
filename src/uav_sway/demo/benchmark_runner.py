@@ -27,13 +27,13 @@ from uav_sway.disturbances.wind_applier import clear_and_apply_wind_world
 from uav_sway.models.model_config import load_model_config
 from uav_sway.native_stack.actuation import CanonicalWrenchActuator
 from uav_sway.native_stack.api import ReferenceSample, WrenchCommand
-from uav_sway.native_stack.r1r1_controllers import LegacyTaskLevelAdapter, MASS_KG
+from uav_sway.native_stack.frozen_adapters import LegacyTaskLevelAdapter, MASS_KG
 from uav_sway.native_stack.sensors import NativeSensorReader
 from uav_sway.task_space.state import CutterTaskSpaceReader
 
 
 ROOT = Path(__file__).resolve().parents[3]
-MODEL = ROOT / "reproducibility/frozen/model/model_5link_controlled.xml"
+MODEL = ROOT / "reproducibility/model/model_5link_controlled.xml"
 MODEL_SHA256 = "19105873c0fcc891ebb85efe6c20c378d5b77b6bf9003559e43ae47ca03d153d"
 OUT = ROOT / "outputs/meeting_demo"
 DT = 0.001
@@ -221,12 +221,12 @@ def run_all(plots_only: bool = False) -> dict[str, Any]:
     return {"metrics":all_metrics,"plot_counts":plot_counts,"summary_png":str(summary)}
 
 
-def run_single(task: str, controller: str) -> dict[str, Any]:
+def run_single(task: str, controller: str, duration: float = 12.0) -> dict[str, Any]:
     """Run one task/controller pair for quick inspection."""
-    controller_id = {"lqr": "full_lqr_048", "satc": "satc_b_027", "full_lqr_048": "full_lqr_048", "satc_b_027": "satc_b_027"}.get(controller, controller)
-    if controller_id not in {"full_lqr_048", "satc_b_027"}:
-        raise ValueError("controller must be lqr or satc")
-    rows, metrics, _ = _run_case(task, controller_id)
+    controller_id = {"pid": "corrected_pid", "lqr": "full_lqr_048", "satc": "satc_b_027", "corrected_pid": "corrected_pid", "full_lqr_048": "full_lqr_048", "satc_b_027": "satc_b_027"}.get(controller, controller)
+    if controller_id not in {"corrected_pid", "full_lqr_048", "satc_b_027"}:
+        raise ValueError("controller must be pid, lqr, or satc")
+    rows, metrics, _ = _run_case(task, controller_id, duration=float(duration))
     target = OUT / task / controller_id
     _write_csv(target / "run.csv", rows)
     target.mkdir(parents=True, exist_ok=True)

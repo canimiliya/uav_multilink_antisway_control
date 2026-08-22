@@ -13,7 +13,7 @@ from scipy.linalg import solve_discrete_are
 
 def load_r0_linear_matrices(root: str | Path) -> tuple[np.ndarray, np.ndarray]:
     root = Path(root)
-    payload = json.loads((root / "reproducibility/v3/r0/linear_model_audit.json").read_text(encoding="utf-8"))
+    payload = json.loads((root / "reproducibility/model/linear_model_audit.json").read_text(encoding="utf-8"))
     return np.asarray(payload["A"], dtype=float).reshape(20, 20), np.asarray(payload["B"], dtype=float).reshape(20, 3)
 
 
@@ -63,7 +63,7 @@ def build_task_metric_alignment(root: str | Path, epsilon: float = 1.0e-5) -> di
     """Identify C_pos/C_vel/C_dir/C_omega_perp on the frozen 20D state."""
 
     root = Path(root)
-    model_path = root / "reproducibility/frozen/model/model_5link_controlled.xml"
+    model_path = root / "reproducibility/model/model_5link_controlled.xml"
     model = mujoco.MjModel.from_xml_path(str(model_path))
     data = mujoco.MjData(model)
     quad_id = int(mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, "quadrotor"))

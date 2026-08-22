@@ -1,6 +1,6 @@
-"""P3-R1E recoverable stress envelope and final showcase harness.
+"""Recoverable stress envelope and final showcase harness.
 
-This module deliberately reuses the frozen P3-R1D plant/controller bridge.  It
+This module deliberately reuses the frozen plant/controller bridge.  It
 only changes the preregistered showcase inputs (6 s move, 5 m/s in-motion X
 wind, and an 3--10 m/s X-wind envelope) and exposes the already frozen outer
 limiter diagnostics.
@@ -28,12 +28,12 @@ from uav_sway.disturbances.wind_applier import clear_and_apply_wind_world
 from uav_sway.models.model_config import load_model_config
 from uav_sway.native_stack.actuation import CanonicalWrenchActuator
 from uav_sway.native_stack.api import ReferenceSample, WrenchCommand
-from uav_sway.native_stack.r1r1_controllers import LegacyTaskLevelAdapter
+from uav_sway.native_stack.frozen_adapters import LegacyTaskLevelAdapter
 from uav_sway.native_stack.sensors import NativeSensorReader
 from uav_sway.task_space.state import CutterTaskSpaceReader
 
 ROOT = Path(__file__).resolve().parents[3]
-MODEL = ROOT / "reproducibility/frozen/model/model_5link_controlled.xml"
+MODEL = ROOT / "reproducibility/model/model_5link_controlled.xml"
 MODEL_SHA256 = "19105873c0fcc891ebb85efe6c20c378d5b77b6bf9003559e43ae47ca03d153d"
 OUT = ROOT / "outputs/meeting_demo_recoverable_v4"
 ART = ROOT / "artifacts/meeting_demo_recoverable_v4"
@@ -264,8 +264,8 @@ def _make_envelope(results: list[dict[str, Any]]) -> dict[str, Any]:
 def _make_docs(results: list[dict[str, Any]], envelope: dict[str, Any]) -> None:
     by = {(r["job"]["task"], r["job"].get("speed_mps", 0), r["job"]["controller"]): r["metrics"] for r in results}
     t1l, t1s = by[("T1",0,"full_lqr_048")], by[("T1",0,"satc_b_027")]; t2l, t2s = by[("T2",0,"full_lqr_048")], by[("T2",0,"satc_b_027")]
-    (OUT / "P3_R1D_CONTROL_LOSS_AUDIT.md").write_text("# P3-R1D control-loss postmortem\n\n- T1 LQR: TASK_CONTROL_LOST (large final error).\n- T1 SATC: SAFETY_FAILURE (historical 430 height violations).\n- T2: LARGE_EXCURSION_NO_RECOVERY.\n- T3: DISTURBANCE_OVERWHELMED_BOTH at 10 m/s.\n\nP3-R1D is retained as failure-boundary evidence, not a successful showcase.\n", encoding="utf-8")
-    guide = f"""# Final showcase guide (CN)\n\nP3-R1D 是 failure-boundary evidence：4 s 大转场、初始 20° 摆动和 10 m/s 持续风超出当前任务控制能力。\n\nP3-R1E 是 controlled stress showcase：固定模型和固定控制器，6 s quintic 转场，T2 在转场中加入 5 m/s 世界 +X 风，T3 扫描 3--10 m/s 世界 +X 风。\n\n## 会议解读\n\n- T1 分类：LQR `{t1l['classification']}`，SATC `{t1s['classification']}`。\n- T2 分类：LQR `{t2l['classification']}`，SATC `{t2s['classification']}`。\n- 风包络：LQR 最大可恢复风速 `{envelope['LQR_MAX_RECOVERABLE_WIND_MPS']}` m/s；SATC 最大可恢复风速 `{envelope['SATC_MAX_RECOVERABLE_WIND_MPS']}` m/s。\n- 所有数字都属于 `DEMO CAPABILITY ENVELOPE ONLY`，不是 Holdout 或新的论文 claim。\n\nY/XY30 历史结果仍保留，但由于五个 y-axis hinge 的平面链模型，不作为核心多连杆消摆结论。\n"""
+    (OUT / "CONTROL_LOSS_AUDIT.md").write_text("# Control-loss postmortem\n\n- T1 LQR: TASK_CONTROL_LOST (large final error).\n- T1 SATC: SAFETY_FAILURE (historical height violations).\n- T2: LARGE_EXCURSION_NO_RECOVERY.\n- T3: DISTURBANCE_OVERWHELMED_BOTH at 10 m/s.\n\nThese records are retained as failure-boundary evidence, not a successful showcase.\n", encoding="utf-8")
+    guide = f"""# Final showcase guide (CN)\n\nThe extreme stress cases are failure-boundary evidence: a large 4 s transition, initial 20° sway, and sustained 10 m/s wind exceed the current task-control envelope.\n\nThis controlled stress showcase uses the fixed model and fixed controllers, a 6 s quintic transition, a 5 m/s world +X wind during T2, and a 3--10 m/s world +X wind sweep for T3.\n\n## 会议解读\n\n- T1 分类：LQR `{t1l['classification']}`，SATC `{t1s['classification']}`。\n- T2 分类：LQR `{t2l['classification']}`，SATC `{t2s['classification']}`。\n- 风包络：LQR 最大可恢复风速 `{envelope['LQR_MAX_RECOVERABLE_WIND_MPS']}` m/s；SATC 最大可恢复风速 `{envelope['SATC_MAX_RECOVERABLE_WIND_MPS']}` m/s。\n- 所有数字都属于 `DEMO CAPABILITY ENVELOPE ONLY`，不是 Holdout 或新的论文 claim。\n\nY/XY30 历史结果仍保留，但由于五个 y-axis hinge 的平面链模型，不作为核心多连杆消摆结论。\n"""
     (DOC / "FINAL_SHOWCASE_GUIDE_CN.md").write_text(guide, encoding="utf-8")
     fig, ax = plt.subplots(2,2, figsize=(10,7)); ax[0,0].bar(["LQR","SATC"],[t1l["final_tip_error_m"],t1s["final_tip_error_m"]]); ax[0,0].set_title("T1 final error (m)"); ax[0,1].bar(["LQR","SATC"],[t2l["postwind_tip_rms_m"],t2s["postwind_tip_rms_m"]]); ax[0,1].set_title("T2 postwind RMS (m)"); ax[1,0].plot(WIND_SPEEDS,[by[("T3",s,"full_lqr_048")]["postwind_tip_rms_m"] for s in WIND_SPEEDS],"o-",label="LQR"); ax[1,0].plot(WIND_SPEEDS,[by[("T3",s,"satc_b_027")]["postwind_tip_rms_m"] for s in WIND_SPEEDS],"o-",label="SATC"); ax[1,0].set_title("T3 wind envelope"); ax[1,0].legend(fontsize=7); ax[1,1].plot(WIND_SPEEDS,[by[("T3",s,"full_lqr_048")]["outer_accel_limit_hit_rate"] for s in WIND_SPEEDS],"o-",label="LQR"); ax[1,1].plot(WIND_SPEEDS,[by[("T3",s,"satc_b_027")]["outer_accel_limit_hit_rate"] for s in WIND_SPEEDS],"o-",label="SATC"); ax[1,1].set_title("outer accel limit hit rate"); ax[1,1].legend(fontsize=7); [a.grid(True) for a in ax.flat]; fig.tight_layout(); fig.savefig(OUT / "FINAL_SHOWCASE_SUMMARY.png", dpi=160); plt.close(fig)
 
@@ -292,7 +292,7 @@ def run_all() -> dict[str, Any]:
     envelope = _make_envelope(results); videos = _render_showcase(results, envelope); _make_docs(results, envelope)
     authority = {"controller_ids": list(CONTROLLERS), "model_sha256": MODEL_SHA256, "limits_read_from_frozen_controller": True, "acceleration_limits_m_s2": {c: 2.0 for c in CONTROLLERS}, "slew_limits_m_s2_per_outer_update": {c: 0.25 for c in CONTROLLERS}, "outer_logging": ["raw_command","post_limit_command","axis_limit_hit","slew_limit_hit"]}
     (ART / "outer_authority_audit.json").write_text(json.dumps(authority, indent=2)+"\n", encoding="utf-8")
-    (ART / "run_manifest.json").write_text(json.dumps({"task":"P3-R1E","jobs":len(results),"model_sha256":MODEL_SHA256,"controller_retuned":False,"model_modified":False,"holdout_executed":False,"videos":videos,"envelope":envelope}, indent=2)+"\n", encoding="utf-8")
+    (ART / "run_manifest.json").write_text(json.dumps({"task":"controlled-stress-showcase","jobs":len(results),"model_sha256":MODEL_SHA256,"controller_retuned":False,"model_modified":False,"holdout_executed":False,"videos":videos,"envelope":envelope}, indent=2)+"\n", encoding="utf-8")
     return {"results":results,"cpu_count":cores,"workers":workers,"wall_time_s":wall,"speedup":serial/wall if wall else None,"envelope":envelope,"videos":videos}
 
 

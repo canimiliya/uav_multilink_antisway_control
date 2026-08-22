@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install locked dependencies
+        run: python -m pip install -r requirements-lock.txt
+      - name: Install package
+        run: python -m pip install -e .
+      - name: Verify frozen evidence
+        run: python scripts/verify_reproducibility.py
+      - name: Run tests
+        run: pytest -q
+      - name: Run short smoke demo
+        run: python examples/run_demo.py --controller pid --duration 1

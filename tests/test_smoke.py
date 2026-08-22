@@ -7,8 +7,8 @@ from pathlib import Path
 import mujoco
 
 
-ROOT = Path(__file__).resolve().parents[2]
-MODEL = ROOT / "reproducibility/frozen/model/model_5link_controlled.xml"
+ROOT = Path(__file__).resolve().parents[1]
+MODEL = ROOT / "reproducibility/model/model_5link_controlled.xml"
 EXPECTED_MODEL_SHA256 = "19105873c0fcc891ebb85efe6c20c378d5b77b6bf9003559e43ae47ca03d153d"
 
 
@@ -49,12 +49,12 @@ def test_frozen_config_presence() -> None:
         "configs/aerodynamics.yaml",
         "configs/s3_pid.yaml",
         "configs/lqr.yaml",
-        "reproducibility/v3/r0/linear_model_audit.json",
-        "reproducibility/v3/r1/task_metric_alignment_audit.json",
-        "reproducibility/v3/r1/task_lqr_freeze.json",
-        "reproducibility/v3/r1/full_lqr_freeze.json",
-        "reproducibility/v3/r1r1/pid_freeze.json",
-        "reproducibility/v5/self/self_freeze.json",
+        "reproducibility/model/linear_model_audit.json",
+        "reproducibility/model/task_metric_alignment_audit.json",
+        "reproducibility/controllers/task_lqr_freeze.json",
+        "reproducibility/controllers/full_lqr_freeze.json",
+        "reproducibility/controllers/pid_freeze.json",
+        "reproducibility/controllers/satc_ofmpc_freeze.json",
     ]
     for relative in required:
         path = ROOT / relative

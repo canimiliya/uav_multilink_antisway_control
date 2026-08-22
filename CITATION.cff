@@ -6,6 +6,5 @@ authors:
   - family-names: "canimiliya"
     given-names: ""
 version: 1.0.0
-date-released: 2026-08-08
 repository-code: "https://github.com/canimiliya/uav_multilink_antisway_control"
 license: MIT
