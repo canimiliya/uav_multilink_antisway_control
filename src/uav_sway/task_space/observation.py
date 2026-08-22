@@ -22,7 +22,7 @@ def _pitch(rotation: np.ndarray) -> float:
 
 
 @dataclass(frozen=True)
-class V3Reference:
+class ControllerReference:
     """Causal world-frame UAV and cutter references."""
 
     uav_position_world: np.ndarray
@@ -46,7 +46,7 @@ class V3Reference:
 
 
 @dataclass(frozen=True)
-class V3Observation:
+class ControllerObservation:
     """Causal 20-state error and the measured cutter task state."""
 
     full_state_error: np.ndarray
@@ -66,7 +66,7 @@ class V3Observation:
             object.__setattr__(self, name, value.copy())
 
 
-class V3StateReader:
+class ControllerStateReader:
     """Read the frozen 20-state schema directly from MuJoCo."""
 
     STATE_NAMES = (
@@ -83,7 +83,7 @@ class V3StateReader:
         self.joint_qveladr = [int(model.jnt_dofadr[j]) for j in self.joint_ids]
         self.task_reader = CutterTaskSpaceReader(model)
 
-    def read(self, model, data, reference: V3Reference) -> V3Observation:
+    def read(self, model, data, reference: ControllerReference) -> ControllerObservation:
         position = np.asarray(data.xpos[self.quad_body_id], dtype=float)
         rotation = np.asarray(data.xmat[self.quad_body_id], dtype=float).reshape(3, 3)
         jacp = np.zeros((3, model.nv), dtype=float)
@@ -103,7 +103,7 @@ class V3StateReader:
         state[9] = float(data.qvel[4])
         state[10:15] = [data.qpos[address] for address in self.joint_qposadr]
         state[15:20] = [data.qvel[address] for address in self.joint_qveladr]
-        return V3Observation(state, position, velocity, self.task_reader.read(model, data))
+        return ControllerObservation(state, position, velocity, self.task_reader.read(model, data))
 
 
 def map_tip_target_to_reference(tip_target_world: np.ndarray, equilibrium_relative_tip: np.ndarray) -> np.ndarray:
@@ -116,6 +116,6 @@ def map_tip_target_to_reference(tip_target_world: np.ndarray, equilibrium_relati
     return target - relative
 
 
-def reference_for_target(tip_target_world: np.ndarray, equilibrium_relative_tip: np.ndarray, time_s: float) -> V3Reference:
+def reference_for_target(tip_target_world: np.ndarray, equilibrium_relative_tip: np.ndarray, time_s: float) -> ControllerReference:
     uav = map_tip_target_to_reference(tip_target_world, equilibrium_relative_tip)
-    return V3Reference(uav, np.zeros(3, dtype=float), np.asarray(tip_target_world, dtype=float), float(time_s))
+    return ControllerReference(uav, np.zeros(3, dtype=float), np.asarray(tip_target_world, dtype=float), float(time_s))

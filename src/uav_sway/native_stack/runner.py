@@ -13,7 +13,7 @@ from .actuation import CanonicalWrenchActuator
 from .api import ReferenceSample, WrenchCommand
 from .controller import NativeStackController
 from .logging import NativeCommandLogger
-from .safety import SafetyV2Limits, evaluate_safety_v2
+from .safety import SafetyLimits, evaluate_safety
 from .scheduler import DeterministicMultiRateScheduler
 from .sensors import NativeSensorReader
 
@@ -55,7 +55,7 @@ class NativeStackRunner:
         self, controller: NativeStackController, reference: ReferenceGenerator,
         duration_s: float, outer_rate_hz: int, inner_rate_hz: int,
         disturbance_callback: Callable[[object, object, int, float], None] | None = None,
-        safety_limits: SafetyV2Limits = SafetyV2Limits(),
+    safety_limits: SafetyLimits = SafetyLimits(),
     ) -> NativeRunResult:
         model = mujoco.MjModel.from_xml_path(str(self.model_path))
         data = mujoco.MjData(model)
@@ -86,7 +86,7 @@ class NativeStackRunner:
                 controller.update_inner(); inner_ticks.append(tick)
             applied = actuator.apply(data, controller.physical_command(), tick, float(model.opt.timestep))
             logger.append(applied, due)
-            safe, tick_reasons = evaluate_safety_v2(packet, applied, origin_uav, origin_tip, safety_limits)
+            safe, tick_reasons = evaluate_safety(packet, applied, origin_uav, origin_tip, safety_limits)
             if not safe: reasons.update(tick_reasons)
             previous = applied.actual
             mujoco.mj_step(model, data)

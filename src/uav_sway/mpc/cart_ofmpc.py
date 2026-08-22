@@ -16,13 +16,13 @@ import numpy as np
 
 from uav_sway.mpc.osqp_solver import OSQPPreviewSolver
 from uav_sway.mpc.qp_builder import QPData
-from uav_sway.controllers.classical import V3ControllerDiagnostics, _V3ControllerBase
+from uav_sway.controllers.classical import ControllerDiagnostics, _ControllerBase
 from uav_sway.mpc.controllability import controllability_basis
-from uav_sway.task_space.observation import V3Observation, V3Reference
+from uav_sway.task_space.observation import ControllerObservation, ControllerReference
 
 
 @dataclass(frozen=True)
-class CARTOFMPCDiagnostics(V3ControllerDiagnostics):
+class CARTOFMPCDiagnostics(ControllerDiagnostics):
     residual_raw: np.ndarray
     residual_clipped: np.ndarray
     residual_represented: np.ndarray
@@ -82,7 +82,7 @@ class CausalResidualEstimator:
         self.previous_actual_command = np.zeros(3)
         self.filtered = np.zeros(20)
 
-    def update(self, state: np.ndarray, reference: V3Reference) -> tuple[np.ndarray, np.ndarray, np.ndarray, float]:
+    def update(self, state: np.ndarray, reference: ControllerReference) -> tuple[np.ndarray, np.ndarray, np.ndarray, float]:
         state = np.asarray(state, dtype=float).reshape(20)
         reference_position = np.asarray(reference.uav_position_world, dtype=float).reshape(3)
         if self.previous_state is None:
@@ -262,7 +262,7 @@ def build_cart_qp(
     return QPData(pmat, qvec, np.asarray(rows), np.asarray(lower), np.asarray(upper), affine, maps)
 
 
-class CARTOFMPC(_V3ControllerBase):
+class CARTOFMPC(_ControllerBase):
     """CART-OFMPC around the immutable task_lqr_009 nominal gain."""
 
     def __init__(self, a: np.ndarray, b: np.ndarray, c_task: np.ndarray, gain: np.ndarray, parameters: dict) -> None:
@@ -296,7 +296,7 @@ class CARTOFMPC(_V3ControllerBase):
         self.trust = 1.0
         self._empty_diagnostics()
 
-    def command(self, observation: V3Observation, reference: V3Reference, dt: float = 0.05) -> np.ndarray:
+    def command(self, observation: ControllerObservation, reference: ControllerReference, dt: float = 0.05) -> np.ndarray:
         if abs(float(dt) - 0.05) > 1.0e-12:
             raise ValueError("CART-OFMPC requires the frozen 0.05 s outer period")
         started = time.perf_counter_ns()

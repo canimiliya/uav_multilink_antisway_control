@@ -14,9 +14,9 @@ from udaan.manif import SO3, TSO3
 
 from uav_sway.control.geometric_inner_loop import GeometricInnerLoop
 from uav_sway.task_space.state import CutterTaskState
-from uav_sway.controllers.classical import CascadedTaskPID, FullStateLQR, V3TaskWeightedLQR
+from uav_sway.controllers.classical import CascadedTaskPID, FullStateLQR, TaskWeightedLQR
 from uav_sway.evaluation.metrics import load_linear_model_matrices
-from uav_sway.task_space.observation import V3Observation, V3Reference
+from uav_sway.task_space.observation import ControllerObservation, ControllerReference
 from uav_sway.controllers.satc_ofmpc import SATCOFMPC
 from .api import SensorPacket, WrenchCommand
 from .controller import AccelerationOuterStackAdapter, NativeStackController
@@ -154,7 +154,7 @@ class LegacyTaskLevelAdapter(AccelerationOuterStackAdapter):
             return CascadedTaskPID(np.array(p["uav_kp"]),np.array(p["uav_kd"]),np.array(p["uav_ki"]),np.array(p["tip_kp"]),np.array(p["tip_kd"]),np.array(p["correction_limit_m"]),p["correction_slew_m_per_update"],p["integral_limit"],p["tip_velocity_mode"])
         if historical_id in {"full_lqr_048","task_lqr_009"}:
             name="full_lqr" if historical_id.startswith("full") else "task_lqr"; p=json.loads((root/f"reproducibility/controllers/{name}_freeze.json").read_text(encoding="utf-8"))["parameters"]
-            cls=FullStateLQR if name=="full_lqr" else V3TaskWeightedLQR; return cls(np.array(p["K"]))
+            cls=FullStateLQR if name=="full_lqr" else TaskWeightedLQR; return cls(np.array(p["K"]))
         if historical_id == "satc_b_027":
             a,b=load_linear_model_matrices(root); metric=json.loads((root/"reproducibility/model/task_metric_alignment_audit.json").read_text(encoding="utf-8")); c=np.vstack([metric[x] for x in ("C_pos","C_vel","C_dir","C_omega_perp")])
             task=np.array(json.loads((root/"reproducibility/controllers/task_lqr_freeze.json").read_text(encoding="utf-8"))["parameters"]["K"]); full=np.array(json.loads((root/"reproducibility/controllers/full_lqr_freeze.json").read_text(encoding="utf-8"))["parameters"]["K"]); params=json.loads((root/"reproducibility/controllers/satc_ofmpc_freeze.json").read_text(encoding="utf-8"))["parameters"]
@@ -165,7 +165,7 @@ class LegacyTaskLevelAdapter(AccelerationOuterStackAdapter):
         super().reset(); self._previous[:] = 0.0
         if self._historical is not None: self._historical.reset()
 
-    def _historical_observation(self, p: SensorPacket) -> tuple[V3Observation,V3Reference]:
+    def _historical_observation(self, p: SensorPacket) -> tuple[ControllerObservation,ControllerReference]:
         target=p.reference.position_world+UAV_MINUS_TIP_TRIM; r=p.rotation_world_from_body
         state=np.zeros(20); state[0]=p.uav_position_world[0]-target[0]; state[1]=p.uav_velocity_world[0]-p.reference.velocity_world[0]
         state[2]=p.uav_position_world[1]-target[1]; state[3]=p.uav_velocity_world[1]-p.reference.velocity_world[1]
@@ -174,7 +174,7 @@ class LegacyTaskLevelAdapter(AccelerationOuterStackAdapter):
         state[10:15]=p.joint_position; state[15:20]=p.joint_velocity
         angle=float(np.sum(p.joint_position)); ca,sa=np.cos(angle),np.sin(angle); ry=np.array([[ca,0,sa],[0,1,0],[-sa,0,ca]]); cutter_rotation=r@ry
         task=CutterTaskState(p.cutter_tip_position_world,p.cutter_tip_velocity_world,r@(p.body_angular_velocity+np.array([0.,float(np.sum(p.joint_velocity)),0.])),cutter_rotation@np.array([1.,0.,0.]),cutter_rotation)
-        obs=V3Observation(state,p.uav_position_world,p.uav_velocity_world,task); ref=V3Reference(target,p.reference.velocity_world,p.reference.position_world,p.time_s)
+        obs=ControllerObservation(state,p.uav_position_world,p.uav_velocity_world,task); ref=ControllerReference(target,p.reference.velocity_world,p.reference.position_world,p.time_s)
         return obs,ref
 
     def update_high_level(self) -> None:

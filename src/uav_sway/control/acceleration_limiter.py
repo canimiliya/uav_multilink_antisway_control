@@ -1,4 +1,4 @@
-"""The frozen S3 amplitude-then-slew acceleration limiter."""
+"""The frozen amplitude-then-slew acceleration limiter."""
 
 from __future__ import annotations
 

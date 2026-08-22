@@ -13,7 +13,7 @@ from ..controller import NativeStackController
 from ..runner import NativeRunResult, NativeStackRunner
 from .resolver import NativeCaseResolver, ResolvedNativeCase, ResolvedReference
 
-AUTHORITATIVE_EXECUTION = "NATIVE_STACK_BENCHMARK_V1_1_AUTHORITATIVE"
+AUTHORITATIVE_EXECUTION = "NATIVE_STACK_BENCHMARK_AUTHORITATIVE"
 
 
 class AuthoritativeNativeCaseRunner:

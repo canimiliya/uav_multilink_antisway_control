@@ -6,12 +6,12 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from uav_sway.control.contracts import V3AccelerationLimiter
-from uav_sway.task_space.observation import V3Observation, V3Reference
+from uav_sway.control.contracts import AccelerationLimiter3D
+from uav_sway.task_space.observation import ControllerObservation, ControllerReference
 
 
 @dataclass(frozen=True)
-class V3ControllerDiagnostics:
+class ControllerDiagnostics:
     raw_command: np.ndarray
     amplitude_limited: np.ndarray
     command: np.ndarray
@@ -21,9 +21,9 @@ class V3ControllerDiagnostics:
     integral: np.ndarray
 
 
-class _V3ControllerBase:
+class _ControllerBase:
     def __init__(self) -> None:
-        self.limiter = V3AccelerationLimiter()
+        self.limiter = AccelerationLimiter3D()
         self.diagnostics = self._diagnostics(np.zeros(3), np.zeros(3), np.zeros(3), np.zeros(3), 0.0, np.zeros(3))
 
     @staticmethod
@@ -38,7 +38,7 @@ class _V3ControllerBase:
         else:
             saturated = np.abs(raw) > limiter.absolute_limit_m_s2 + 1.0e-12
             slew = np.abs(command - amplitude) > 1.0e-12
-        return V3ControllerDiagnostics(raw.copy(), amplitude.copy(), command.copy(), saturated, slew, float(state_norm), np.asarray(integral, dtype=float).reshape(3).copy())
+        return ControllerDiagnostics(raw.copy(), amplitude.copy(), command.copy(), saturated, slew, float(state_norm), np.asarray(integral, dtype=float).reshape(3).copy())
 
     def reset(self) -> None:
         self.limiter.reset()
@@ -53,39 +53,7 @@ class _V3ControllerBase:
         return result
 
 
-class V3TaskPID(_V3ControllerBase):
-    """Independent tip-space PID axes with conditional anti-windup."""
-
-    def __init__(self, kp: np.ndarray, kd: np.ndarray, ki: np.ndarray, integral_limit: float = 1.0) -> None:
-        super().__init__()
-        self.kp = np.asarray(kp, dtype=float).reshape(3).copy()
-        self.kd = np.asarray(kd, dtype=float).reshape(3).copy()
-        self.ki = np.asarray(ki, dtype=float).reshape(3).copy()
-        self.integral_limit = float(integral_limit)
-        if not np.isfinite(np.r_[self.kp, self.kd, self.ki]).all() or self.integral_limit <= 0.0:
-            raise ValueError("PID gains and integral limit must be finite and valid")
-        self.integral = np.zeros(3, dtype=float)
-
-    def reset(self) -> None:
-        super().reset()
-        self.integral = np.zeros(3, dtype=float)
-
-    def command(self, observation: V3Observation, reference: V3Reference, dt: float = 0.05) -> np.ndarray:
-        dt = float(dt)
-        if dt <= 0.0 or not np.isfinite(dt):
-            raise ValueError("dt must be positive and finite")
-        position_error = observation.task_state.tip_position_world - reference.tip_position_world
-        velocity_error = observation.task_state.tip_velocity_world - reference.uav_velocity_world
-        proposed_integral = np.clip(self.integral + position_error * dt, -self.integral_limit, self.integral_limit)
-        raw = -self.kp * position_error - self.kd * velocity_error - self.ki * proposed_integral
-        amplitude = np.clip(raw, -self.limiter.absolute_limit_m_s2, self.limiter.absolute_limit_m_s2)
-        candidate = self.limiter.previous + np.clip(amplitude - self.limiter.previous, -self.limiter.slew_limit_m_s2_per_update, self.limiter.slew_limit_m_s2_per_update)
-        blocked = (np.abs(raw - candidate) > 1.0e-12) & (np.sign(position_error) == np.sign(raw - candidate))
-        self.integral = np.where(blocked, self.integral, proposed_integral)
-        return self._finish(-self.kp * position_error - self.kd * velocity_error - self.ki * self.integral, np.linalg.norm(observation.full_state_error), self.integral)
-
-
-class CascadedTaskPID(_V3ControllerBase):
+class CascadedTaskPID(_ControllerBase):
     """Classical cascaded tip-reference correction and UAV PID/PD.
 
     The slow outer loop uses only the currently measured cutter-tip error and
@@ -133,7 +101,7 @@ class CascadedTaskPID(_V3ControllerBase):
         self.integral = np.zeros(3, dtype=float)
         self.reference_correction = np.zeros(3, dtype=float)
 
-    def command(self, observation: V3Observation, reference: V3Reference, dt: float = 0.05) -> np.ndarray:
+    def command(self, observation: ControllerObservation, reference: ControllerReference, dt: float = 0.05) -> np.ndarray:
         dt = float(dt)
         if dt <= 0.0 or not np.isfinite(dt):
             raise ValueError("dt must be positive and finite")
@@ -174,7 +142,7 @@ class CascadedTaskPID(_V3ControllerBase):
         return self._finish(raw, np.linalg.norm(observation.full_state_error), self.integral)
 
 
-class FullStateLQR(_V3ControllerBase):
+class FullStateLQR(_ControllerBase):
     """20D full-state discrete LQR with a common 3D limiter."""
 
     def __init__(self, gain: np.ndarray) -> None:
@@ -183,10 +151,10 @@ class FullStateLQR(_V3ControllerBase):
         if not np.isfinite(self.gain).all():
             raise ValueError("Full-State LQR gain must be finite")
 
-    def command(self, observation: V3Observation, reference: V3Reference, dt: float = 0.05) -> np.ndarray:
+    def command(self, observation: ControllerObservation, reference: ControllerReference, dt: float = 0.05) -> np.ndarray:
         del reference, dt
         return self._finish(-self.gain @ observation.full_state_error, np.linalg.norm(observation.full_state_error), np.zeros(3))
 
 
-class V3TaskWeightedLQR(FullStateLQR):
+class TaskWeightedLQR(FullStateLQR):
     """Full-state LQR whose Q matrix is weighted by measured cutter outputs."""

@@ -4,8 +4,6 @@ import hashlib
 import json
 from pathlib import Path
 
-import pytest
-
 import mujoco
 
 
@@ -37,13 +35,20 @@ def test_lqr_import() -> None:
     assert FullStateLQR.__name__ == "FullStateLQR"
 
 
-def test_legacy_class_names_are_removed() -> None:
-    legacy_pid = "V3" + "CascadedTaskPID"
-    legacy_lqr = "V3" + "FullStateLQR"
-    with pytest.raises(ImportError):
-        exec("from uav_sway.controllers.classical import " + legacy_pid, {})
-    with pytest.raises(ImportError):
-        exec("from uav_sway.controllers.classical import " + legacy_lqr, {})
+def test_public_controller_api() -> None:
+    from uav_sway.controllers import CascadedTaskPID, FullStateLQR, SATCOFMPC, TaskWeightedLQR
+
+    assert {CascadedTaskPID.__name__, FullStateLQR.__name__, SATCOFMPC.__name__, TaskWeightedLQR.__name__} == {
+        "CascadedTaskPID", "FullStateLQR", "SATCOFMPC", "TaskWeightedLQR",
+    }
+
+
+def test_public_task_space_and_control_api() -> None:
+    from uav_sway.task_space import ControllerObservation, ControllerReference, ControllerStateReader, CutterTargetMapper
+    from uav_sway.control import AccelerationCommand3D, AccelerationLimiter3D, OuterLoopController
+
+    assert all((ControllerObservation, ControllerReference, ControllerStateReader, CutterTargetMapper))
+    assert all((AccelerationCommand3D, AccelerationLimiter3D, OuterLoopController))
 
 
 def test_satc_import() -> None:
@@ -58,7 +63,7 @@ def test_frozen_config_presence() -> None:
         "configs/airframes/dji_matrice_400.yaml",
         "configs/payloads/cutter_box_2p5kg.yaml",
         "configs/aerodynamics.yaml",
-        "configs/s3_pid.yaml",
+        "configs/pid.yaml",
         "configs/lqr.yaml",
         "reproducibility/model/linear_model_audit.json",
         "reproducibility/model/task_metric_alignment_audit.json",

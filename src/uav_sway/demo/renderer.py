@@ -37,7 +37,7 @@ PUBLIC_SHOWCASE_SET: tuple[dict[str, Any], ...] = (
         "controller_id": "hybrid_x007_y041_z041",
         "runner_id": "corrected_pid",
         "source_path": "src/uav_sway/controllers/classical.py",
-        "config_path": "configs/s3_pid.yaml",
+        "config_path": "configs/pid.yaml",
         "evidence_path": "reproducibility/controllers/pid_freeze.json",
         "acceleration_mainline": True,
         "native_stack_only": False,

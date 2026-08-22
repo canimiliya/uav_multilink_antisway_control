@@ -51,7 +51,7 @@ class LQRDiagnostics:
 
 
 class FullStateLQR:
-    """Returns only x acceleration; all actuator conversion stays in S3's inner loop."""
+    """Returns only x acceleration; actuator conversion stays in the inner loop."""
 
     def __init__(self, gain: np.ndarray, ax_min: float = -2.0,
                  ax_max: float = 2.0, slew_limit: float = 0.25):

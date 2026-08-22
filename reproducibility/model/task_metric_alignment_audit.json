@@ -1,7 +1,7 @@
 {
-  "task": "V3-R1-task-metric-alignment",
+  "task": "task-metric-alignment",
   "source": "frozen MuJoCo model and equilibrium finite differences",
-  "R0_C_task_v3_unchanged": true,
+  "C_task_unchanged": true,
   "outputs": [
     "C_pos",
     "C_vel",
@@ -302,5 +302,7 @@
     0.0,
     0.0
   ],
-  "pass": true
+  "pass": true,
+  "numeric_payload_unchanged": true,
+  "metadata_only_renamed": true
 }

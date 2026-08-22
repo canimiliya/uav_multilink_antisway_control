@@ -1,18 +1,20 @@
-"""S3 position-PID and shared geometric inner-loop control."""
+"""Low-level position, command-limiting, and inner-loop control components."""
 
 from .base import ControlState, ReferenceState, SwayController
-from .position_pid import PositionPID
-
-__all__ = ["ControlState", "ReferenceState", "SwayController", "PositionPID"]
 from .acceleration_limiter import AccelerationLimiter
-from .full_state_lqr import FullStateLQR
-from .contracts import V3AccelerationCommand, V3AccelerationLimiter, V3Controller, V3_INNER_LOOP_CONTRACT
+from .acceleration_limiter import AccelerationLimitDiagnostics
+from .position_pid import PositionPID
+from .contracts import AccelerationCommand3D, AccelerationLimiter3D, OuterLoopController, INNER_LOOP_CONTRACT
 
 __all__ = [
+    "ControlState",
+    "ReferenceState",
+    "SwayController",
     "AccelerationLimiter",
-    "FullStateLQR",
-    "V3AccelerationCommand",
-    "V3AccelerationLimiter",
-    "V3Controller",
-    "V3_INNER_LOOP_CONTRACT",
+    "AccelerationLimitDiagnostics",
+    "PositionPID",
+    "AccelerationCommand3D",
+    "AccelerationLimiter3D",
+    "OuterLoopController",
+    "INNER_LOOP_CONTRACT",
 ]

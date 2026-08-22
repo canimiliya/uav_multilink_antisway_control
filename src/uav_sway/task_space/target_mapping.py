@@ -1,4 +1,4 @@
-"""V2 cutter-target to UAV-reference mapping and shared 3-D limits."""
+"""Cutter-target mapping and shared 3-D control limits."""
 
 from __future__ import annotations
 
@@ -18,10 +18,10 @@ class CutterTargetMapper:
         relative = np.asarray(self.tip_relative_equilibrium_m, dtype=float).reshape(3)
         axis = np.asarray(self.cutter_axis_equilibrium, dtype=float).reshape(3)
         if not np.isfinite(relative).all() or not np.isfinite(axis).all():
-            raise ValueError("V2 equilibrium geometry must be finite")
+            raise ValueError("equilibrium geometry must be finite")
         norm = float(np.linalg.norm(axis))
         if norm <= 1.0e-12:
-            raise ValueError("V2 equilibrium cutter axis must be non-zero")
+            raise ValueError("equilibrium cutter axis must be non-zero")
         object.__setattr__(self, "tip_relative_equilibrium_m", relative.copy())
         object.__setattr__(self, "cutter_axis_equilibrium", axis / norm)
 
@@ -40,7 +40,7 @@ class CutterTargetMapper:
 
 @dataclass(frozen=True)
 class Shared3DControlLimits:
-    """Uniform V2 y/z acceleration and per-update slew limits."""
+    """Uniform y/z acceleration and per-update slew limits."""
 
     ay_abs_max_m_s2: float = 2.0
     az_abs_max_m_s2: float = 2.0

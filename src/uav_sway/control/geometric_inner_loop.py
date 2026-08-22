@@ -8,7 +8,7 @@ from udaan.manif import SO3, TSO3
 
 from .base import ControlState, ReferenceState
 from uav_sway.task_space.state import CutterTaskState
-from uav_sway.task_space.v2_reference import Shared3DControlLimits
+from uav_sway.task_space.target_mapping import Shared3DControlLimits
 
 
 class GeometricInnerLoop:
@@ -46,7 +46,7 @@ class GeometricInnerLoop:
 
         The task-space runtime supplies the measured cutter task state and the
         external cutter target.  The UAV-state fallback is retained for older
-        callers outside the frozen V2 runner.
+        callers outside the frozen benchmark runner.
         """
         if (task_state is None) != (tip_target_world is None):
             raise ValueError("task_state and tip_target_world must be supplied together")

@@ -1,4 +1,4 @@
-"""Preregistered Native Benchmark safety-v2 envelope."""
+"""Preregistered Native Benchmark safety envelope."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from .api import AppliedPhysicalCommand, SensorPacket
 
 
 @dataclass(frozen=True, slots=True)
-class SafetyV2Limits:
+class SafetyLimits:
     minimum_height_m: float = 0.05
     maximum_joint_angle_rad: float = float(np.deg2rad(100.0))
     maximum_roll_pitch_rad: float = float(np.deg2rad(25.0))
@@ -18,9 +18,9 @@ class SafetyV2Limits:
     maximum_tip_horizontal_displacement_m: float = 10.0
 
 
-def evaluate_safety_v2(
+def evaluate_safety(
     packet: SensorPacket, applied: AppliedPhysicalCommand, origin_uav: np.ndarray,
-    origin_tip: np.ndarray, limits: SafetyV2Limits = SafetyV2Limits(),
+    origin_tip: np.ndarray, limits: SafetyLimits = SafetyLimits(),
 ) -> tuple[bool, tuple[str, ...]]:
     reasons: list[str] = []
     values = np.r_[

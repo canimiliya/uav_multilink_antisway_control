@@ -6,13 +6,13 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from uav_sway.controllers.classical import V3ControllerDiagnostics, _V3ControllerBase
-from uav_sway.task_space.observation import V3Observation, V3Reference
+from uav_sway.controllers.classical import ControllerDiagnostics, _ControllerBase
+from uav_sway.task_space.observation import ControllerObservation, ControllerReference
 from uav_sway.mpc.cart_ofmpc import CARTOFMPC
 
 
 @dataclass(frozen=True)
-class SATCOFMPCDiagnostics(V3ControllerDiagnostics):
+class SATCOFMPCDiagnostics(ControllerDiagnostics):
     shock_score: float
     reference_shock: float
     innovation_shock: float
@@ -51,7 +51,7 @@ class SATCOFMPCDiagnostics(V3ControllerDiagnostics):
     limiter_mismatch: float
 
 
-class SATCOFMPC(_V3ControllerBase):
+class SATCOFMPC(_ControllerBase):
     """Causal CART plus bumpless final-input transient coordination.
 
     The controller never receives wind truth.  A reference jump and the rate
@@ -106,7 +106,7 @@ class SATCOFMPC(_V3ControllerBase):
             return 0.0
         return float(np.clip(-(first @ second) / denominator, 0.0, 1.0))
 
-    def command(self, observation: V3Observation, reference: V3Reference, dt: float = 0.05) -> np.ndarray:
+    def command(self, observation: ControllerObservation, reference: ControllerReference, dt: float = 0.05) -> np.ndarray:
         if abs(float(dt) - 0.05) > 1.0e-12:
             raise ValueError("SATC-OFMPC requires the frozen 0.05 s outer period")
         state = np.asarray(observation.full_state_error, dtype=float).reshape(20)
